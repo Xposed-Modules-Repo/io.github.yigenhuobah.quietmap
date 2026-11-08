@@ -2,7 +2,7 @@
 
 让高德地图安静下来的 LSPosed 模块：后台净化、数据层断源、收敛弹窗与统计上报。
 
-> 当前版本 **0.8.8**（2026-11-05，versionCode 17）。
+> 当前版本 **0.8.9**（2026-11-08，versionCode 18）。
 > 目标应用：**高德地图 17.02.0.2010**（`com.autonavi.minimap`）。
 > 与高德地图官方无任何关联，仅供学习、研究和个人设备使用。
 
@@ -23,7 +23,7 @@
 
 ## 安装
 
-1. 安装 `quietmap-0.8.8.apk`。
+1. 安装 `quietmap-0.8.9.apk`。
 2. 在 LSPosed 管理器中启用「静途」，作用域勾选「高德地图」。
 3. 强制停止并重新打开高德地图。
 4. 打开模块 App，确认状态卡显示「已激活」。
@@ -128,7 +128,7 @@ bash tools/check-mounts.sh "/path/to/amap.apk"
 ## 已知限制
 
 - `libxposed` 的 `XposedProvider` 在 `SendBinder` 调用上没有调用方认证，属框架约定风险（不影响本模块自身逻辑）。
-- 诊断 Provider 仅接受高德 UID：`Binder.getCallingUid` + `getPackagesForUid` 必须命中 `com.autonavi.minimap`；诊断 socket 同样校验 peer UID，只接受高德或模块自身，其他应用的连接被拒绝。
+- 诊断 Provider 仅接受高德 UID：`Binder.getCallingUid` + `getPackagesForUid` 必须命中 `com.autonavi.minimap`；诊断 socket 作为等价写入入口复用同一 UID/包名判定，只接受高德，模块自身与其它应用的连接被拒绝。
 - 诊断回传在 HyperOS 上 socket 不可用（`socket not created`），实际可用的是 Provider 通道；文件通道仅调试/旧系统兜底。socket 失败会回退，不阻断诊断。
 - UI-05 通知权限引导与 AD-12 运营活动已在真机注册挂载点，但真实场景未验证（无命中/未触发），不能视为已生效。
 - UI-06 消息中心通过 AJX badge/localStorage bridge 清空消息页会话列表与消息图标角标；会一并隐藏账号安全、公共交通动态等真实通知，可单独关闭。仅保证高德 17.02.0.2010，并且只作用于消息页/我的页。
@@ -212,7 +212,7 @@ bash tools/check-mounts.sh
 当前基线：单测 **366** 个用例通过（`:app:testDebugUnitTest`，0 失败 / 0 跳过）；`:app:lintDebug` 0 error；`tools/verify-apk.sh` PASS；`tools/check-mounts.sh` 对高德 17.02.0.2010 63/63 OK。
 
 工具链：AGP 8.13.2 + Gradle wrapper 8.13 + JDK 21（构建），Java source/target 17，compileSdk 37 / minSdk 29 / targetSdk 36。
-release 产物：`app/build/outputs/apk/release/quietmap-0.8.8.apk`（R8 minify + shrinkResources）。
+release 产物：`app/build/outputs/apk/release/quietmap-0.8.9.apk`（R8 minify + shrinkResources）。
 签名读取仓库根目录 `keystore.properties`；缺少该文件时 release 构建直接失败，不会产出用 debug 证书签名的包。
 
 ## GPL 红线
