@@ -2,19 +2,22 @@
 
 让高德地图安静下来的 LSPosed 模块：后台净化、数据层断源、收敛弹窗与统计上报。
 
-> 当前版本 **0.9.0**（2026-11-08，versionCode 19）。
-> 目标应用：**高德地图 17.02.0.2010**（`com.autonavi.minimap`）。
+> 当前版本 **0.9.3**（2026-11-15，versionCode 22）。
+> 目标应用：**高德地图 17.03.0.2008**（`com.autonavi.minimap`）。
 > 与高德地图官方无任何关联，仅供学习、研究和个人设备使用。
 
-**仓库**：<https://github.com/yigenhuobah/quietmap> ｜ **下载**：[Releases](https://github.com/yigenhuobah/quietmap/releases) ｜ **反馈**：[Issues](https://github.com/yigenhuobah/quietmap/issues/new/choose)
+**主平台**：[CodeFloe](https://codefloe.com/quiet-tools/quietmap) ｜ **项目主页**：[quiet-tools.codefloe.page](https://quiet-tools.codefloe.page/) ｜ **下载**：[Releases](https://codefloe.com/quiet-tools/quietmap/releases) ｜ **通知**：[Telegram](https://t.me/yigenhuobah) ｜ **反馈**：[Issues](https://codefloe.com/quiet-tools/quietmap/issues/new)
 
 更新日志见 [CHANGELOG.md](CHANGELOG.md)。
+
+> 源码、Issues 与 Releases 已迁移到 CodeFloe；GitHub 官方 Xposed 镜像保留旧版本，恢复后同步。
+
 
 ## 兼容性
 
 | 项 | 值 |
 |---|---|
-| 目标应用 | `com.autonavi.minimap` **17.02.0.2010** |
+| 目标应用 | `com.autonavi.minimap` **17.03.0.2008** |
 | 模块包名 | `io.github.yigenhuobah.quietmap` |
 | Xposed API | libxposed API 102（`minApiVersion=102` / `targetApiVersion=102`） |
 | 系统要求 | Android 10+（minSdk 29） |
@@ -23,7 +26,7 @@
 
 ## 安装
 
-1. 安装 `quietmap-0.8.9.apk`。
+1. 安装 `quietmap-0.9.3.apk`。
 2. 在 LSPosed 管理器中启用「静途」，作用域勾选「高德地图」。
 3. 强制停止并重新打开高德地图。
 4. 打开模块 App，确认状态卡显示「已激活」。
@@ -98,20 +101,20 @@
 
 | 模块 | 仓库 |
 |---|---|
-| 云音乐工具箱 (CloudMusicTool) | <https://github.com/yigenhuobah/cloudmusictool> |
-| 静盒 (QuietBox) | <https://github.com/yigenhuobah/quietbox> |
-| 静途 (QuietMap) | <https://github.com/yigenhuobah/quietmap> |
-| 贴吧静净 (TiebaQuiet) | <https://github.com/yigenhuobah/tiebaquiet> |
+| 云音乐工具箱 (CloudMusicTool) | <https://codefloe.com/quiet-tools/cloudmusictool> |
+| 静盒 (QuietBox) | <https://codefloe.com/quiet-tools/quietbox> |
+| 静途 (QuietMap) | <https://codefloe.com/quiet-tools/quietmap> |
+| 贴吧静净 (TiebaQuiet) | <https://codefloe.com/quiet-tools/tiebaquiet> |
 
 ## 兼容性说明
 
-**仅保证高德地图 17.02.0.2010。** 其它版本尽力而为：大多数挂载点是非混淆业务类，升级后大概率仍在，但方法签名可能变化。升级高德后先跑挂载点体检：
+**仅保证高德地图 17.03.0.2008。** 其它版本尽力而为：大多数挂载点是非混淆业务类，升级后大概率仍在，但方法签名可能变化。升级高德后先跑挂载点体检：
 
 ```bash
 bash tools/check-mounts.sh "/path/to/amap.apk"
 ```
 
-输出 `OK` / `SIG` / `GONE` 三态，共 **63 项**。DexSQL 缓存按 APK sha256 前 16 位隔离（`tools/.dexsql-cache/<sha256>/`），并在 `cache.meta` 记录路径/大小/mtime/sha256：换包、同路径替换或复用 `--cache-dir` 时指纹不符会自动重建，不会把旧包结果当成新包；查询失败（dexsql 非 0 退出或结果异常）会直接中止，不会把错误结果当成 0 行而误报 `GONE`。脚本会打印 APK 的 versionName，非 **17.02.0.2010** 时给出 WARN（只提示、不中断）。混淆挂载点（`Lah5#attemptRequestData`、`Ln8#run`、`Lry1#addToQueue`、`Lev1#IDeliveryDisplay.start`，17.01.0.2012 为 Lze5/La8/Lcx1/Llt1）随版本改名的风险最高，失效时模块只记 `skip`，不会影响其余钩子。
+输出 `OK` / `SIG` / `GONE` 三态，共 **63 项**。DexSQL 缓存按 APK sha256 前 16 位隔离（`tools/.dexsql-cache/<sha256>/`），并在 `cache.meta` 记录路径/大小/mtime/sha256：换包、同路径替换或复用 `--cache-dir` 时指纹不符会自动重建，不会把旧包结果当成新包；查询失败（dexsql 非 0 退出或结果异常）会直接中止，不会把错误结果当成 0 行而误报 `GONE`。脚本会打印 APK 的 versionName，非 **17.03.0.2008** 时给出 WARN（只提示、不中断）。混淆挂载点（`net/Requester#attemptRequestData`、`i5#run`、`DialogConflictMgrImpl#addToQueue`、`DeliveryDisplayHelper#start`；17.02.0.2010 为 `Lah5`/`Ln8`/`Lry1`/`Lev1`）随版本改名的风险最高，失效时模块只记 `skip`，不会影响其余钩子。
 
 ## 稳定性设计（摘要）
 
@@ -127,11 +130,12 @@ bash tools/check-mounts.sh "/path/to/amap.apk"
 
 ## 已知限制
 
+- **安装包签名校验**：启动时核对 APK 签名证书与内置指纹；签名不符会首次启动警告一次（不阻断功能）。该校验只能提示二次打包，恶意修改仍可移除，请优先从 CodeFloe Releases / Telegram 频道下载。
 - `libxposed` 的 `XposedProvider` 在 `SendBinder` 调用上没有调用方认证，属框架约定风险（不影响本模块自身逻辑）。
 - 诊断 Provider 仅接受高德 UID：`Binder.getCallingUid` + `getPackagesForUid` 必须命中 `com.autonavi.minimap`；诊断 socket 作为等价写入入口复用同一 UID/包名判定，只接受高德，模块自身与其它应用的连接被拒绝。
 - 诊断回传在 HyperOS 上 socket 不可用（`socket not created`），实际可用的是 Provider 通道；文件通道仅调试/旧系统兜底。socket 失败会回退，不阻断诊断。
 - UI-05 通知权限引导与 AD-12 运营活动已在真机注册挂载点，但真实场景未验证（无命中/未触发），不能视为已生效。
-- UI-06 消息中心通过 AJX badge/localStorage bridge 清空消息页会话列表与消息图标角标；会一并隐藏账号安全、公共交通动态等真实通知，可单独关闭。仅保证高德 17.02.0.2010，并且只作用于消息页/我的页。
+- UI-06 消息中心通过 AJX badge/localStorage bridge 清空消息页会话列表与消息图标角标；会一并隐藏账号安全、公共交通动态等真实通知，可单独关闭。仅保证高德 17.03.0.2008，并且只作用于消息页/我的页。
 - 诊断会话隔离：session 不一致的旧文件与启动时间更早的迟到批次会被忽略；目标进程重启后、首次回传前诊断页可能显示 `—`，属预期行为。
 - DexKit 扫描仅在主进程启用；非主进程（`:locationservice`、`:widgetProvider`）走类名/方法名兜底，且不再回传 reg/skip。
 - release 缺少 `keystore.properties` 时构建直接失败（`assembleRelease` / `bundleRelease` 抛 `GradleException`），避免产出 debug 签名的正式包。
@@ -209,7 +213,7 @@ JAVA_HOME="F:/Program Files/Java/jdk-21" ./gradlew test assembleDebug assembleRe
 bash tools/check-mounts.sh
 ```
 
-当前基线：单测 **366** 个用例通过（`:app:testDebugUnitTest`，0 失败 / 0 跳过）；`:app:lintDebug` 0 error；`tools/verify-apk.sh` PASS；`tools/check-mounts.sh` 对高德 17.02.0.2010 63/63 OK。
+当前基线：单测 **498** 个用例通过（`:app:testDebugUnitTest`，0 失败 / 0 跳过）；`:app:lintDebug` 0 error；`tools/verify-apk.sh` PASS；`tools/check-mounts.sh` 对高德 17.03.0.2008 63/63 OK。
 
 工具链：AGP 8.13.2 + Gradle wrapper 8.13 + JDK 21（构建），Java source/target 17，compileSdk 37 / minSdk 29 / targetSdk 36。
 release 产物：`app/build/outputs/apk/release/quietmap-0.8.9.apk`（R8 minify + shrinkResources）。
