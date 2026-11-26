@@ -2,7 +2,7 @@
 
 让高德地图安静下来的 LSPosed 模块：后台净化、数据层断源、收敛弹窗与统计上报。
 
-> 当前版本 **0.9.4**（2026-11-23，versionCode 23）。
+> 当前版本 **0.9.5**（2026-11-26，versionCode 24）。
 > 目标应用：**高德地图 17.03.0.2008**（`com.autonavi.minimap`）。
 > 与高德地图官方无任何关联，仅供学习、研究和个人设备使用。
 
@@ -24,9 +24,19 @@
 | 框架 | 支持 API 102 的 LSPosed / Vector |
 | 架构 | Java 17 + XML + Material 3，无 Kotlin/Compose |
 
+## 多版本适配
+
+锚点表按宿主 `versionCode` 选择 profile；当前试点只有一个 profile（17.03.0.2008 / 170300），不追溯历史版本。每个 profile 声明自己挂载的全部锚点（mount id），设置页按当前宿主 profile 逐功能降级：宿主缺少某功能依赖的挂载点时该开关置灰并标注「当前宿主版本不可用」。
+
+<!-- BEGIN:VERSION_MATRIX -->
+| 宿主版本 | versionCode | 状态 | 可用功能数 | 缺失功能 |
+| --- | --- | --- | --- | --- |
+| 17.03.0.2008 | 170300 | 最新 | 22 | — |
+<!-- END:VERSION_MATRIX -->
+
 ## 安装
 
-1. 安装 `quietmap-0.9.4.apk`。
+1. 安装 `quietmap-0.9.5.apk`。
 2. 在 LSPosed 管理器中启用「静途」，作用域勾选「高德地图」。
 3. 强制停止并重新打开高德地图。
 4. 打开模块 App，确认状态卡显示「已激活」。
@@ -114,7 +124,7 @@
 bash tools/check-mounts.sh "/path/to/amap.apk"
 ```
 
-输出 `OK` / `SIG` / `GONE` 三态，共 **63 项**。DexSQL 缓存按 APK sha256 前 16 位隔离（`tools/.dexsql-cache/<sha256>/`），并在 `cache.meta` 记录路径/大小/mtime/sha256：换包、同路径替换或复用 `--cache-dir` 时指纹不符会自动重建，不会把旧包结果当成新包；查询失败（dexsql 非 0 退出或结果异常）会直接中止，不会把错误结果当成 0 行而误报 `GONE`。脚本会打印 APK 的 versionName，非 **17.03.0.2008** 时给出 WARN（只提示、不中断）。混淆挂载点（`net/Requester#attemptRequestData`、`i5#run`、`DialogConflictMgrImpl#addToQueue`、`DeliveryDisplayHelper#start`；17.02.0.2010 为 `Lah5`/`Ln8`/`Lry1`/`Lev1`）随版本改名的风险最高，失效时模块只记 `skip`，不会影响其余钩子。
+输出 `OK` / `SIG` / `GONE` 三态；单 profile 时共 **63 项**。脚本按 APK `versionCode` 精确选择 anchors.json 的 profile（当前仅 **17.03.0.2008 / 170300**），只校验该 profile 展开后的 mounts；读不到或未收录的版本默认 `exit 2`，只有显式 `--allow-version` 才降级 WARN 并按最新 profile 继续。DexSQL 缓存按 APK sha256 前 16 位隔离（`tools/.dexsql-cache/<sha256>/`），并在 `cache.meta` 记录路径/大小/mtime/sha256：换包、同路径替换或复用 `--cache-dir` 时指纹不符会自动重建，不会把旧包结果当成新包；查询失败（dexsql 非 0 退出或结果异常）会直接中止，不会把错误结果当成 0 行而误报 `GONE`。混淆挂载点（`net/Requester#attemptRequestData`、`i5#run`、`DialogConflictMgrImpl#addToQueue`、`DeliveryDisplayHelper#start`；17.02.0.2010 为 `Lah5`/`Ln8`/`Lry1`/`Lev1`）随版本改名的风险最高，失效时模块只记 `skip`，不会影响其余钩子。
 
 ## 稳定性设计（摘要）
 
@@ -213,10 +223,10 @@ JAVA_HOME="F:/Program Files/Java/jdk-21" ./gradlew test assembleDebug assembleRe
 bash tools/check-mounts.sh
 ```
 
-当前基线：单测 **540** 个用例通过（`:app:testDebugUnitTest`，0 失败 / 0 跳过）；`:app:lintDebug` 0 error；`tools/verify-apk.sh` PASS；`tools/check-mounts.sh` 对高德 17.03.0.2008 63/63 OK。
+当前基线：单测 **572** 个用例通过（`:app:testDebugUnitTest`，0 失败 / 0 跳过）；`:app:lintDebug` 0 error；`tools/verify-apk.sh` PASS；`tools/check-mounts.sh` 对高德 17.03.0.2008 63/63 OK。
 
 工具链：AGP 8.13.2 + Gradle wrapper 8.13 + JDK 21（构建），Java source/target 17，compileSdk 37 / minSdk 29 / targetSdk 36。
-release 产物：`app/build/outputs/apk/release/quietmap-<versionName>.apk`（当前 0.9.4；R8 minify + shrinkResources）。
+release 产物：`app/build/outputs/apk/release/quietmap-<versionName>.apk`（当前 0.9.5；R8 minify + shrinkResources）。
 签名读取仓库根目录 `keystore.properties`；缺少该文件时 release 构建直接失败，不会产出用 debug 证书签名的包。
 
 ## GPL 红线
